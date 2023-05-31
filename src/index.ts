@@ -1,9 +1,10 @@
-import express from "express";
+import 'dotenv/config';
+import express from 'express';
 
 const app = express();
 
 app.use(express.json());
 
-app.listen("3000", () => {
-  console.log("Servidor inicializado na porta 3000");
+app.listen('3000', () => {
+  console.log('Servidor inicializado na porta 3000');
 });
