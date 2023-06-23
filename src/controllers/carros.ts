@@ -28,8 +28,72 @@ export const detalharCarros = async (req: Request, res: Response) => {
   }
 };
 
-export const cadastrarCarros = async (req: Request, res: Response) => {};
+export const cadastrarCarros = async (req: Request, res: Response) => {
+  const { marca, modelo, cor, ano, valor } = req.body;
 
-export const atualizarCarros = async (req: Request, res: Response) => {};
+  try {
+    const carro = await knex<Omit<Carro, 'id'>>('carros')
+      .insert({
+        modelo,
+        marca,
+        valor,
+        ano,
+        cor,
+      })
+      .returning('*');
+    return res.status(201).json(carro);
+  } catch {
+    return res.status(500).json({ message: 'Erro interno do servidor' });
+  }
+};
 
-export const excluirCarros = async (req: Request, res: Response) => {};
+export const atualizarCarros = async (req: Request, res: Response) => {
+  const { marca, modelo, cor, ano, valor } = req.body;
+  const { id } = req.params;
+
+  try {
+    const carro = await knex<Carro>('carros')
+      .where({ id: Number(id) })
+      .first();
+
+    if (!carro) {
+      return res.status(404).json({ mensagem: 'Carro não encontrado' });
+    }
+
+    await knex<Carro>('carros')
+      .where({ id: Number(id) })
+      .update({
+        modelo,
+        marca,
+        valor,
+        ano,
+        cor,
+      });
+
+    return res.status(204).send();
+  } catch {
+    return res.status(500).json({ message: 'Erro interno do servidor' });
+  }
+};
+
+export const excluirCarros = async (req: Request, res: Response) => {
+  const { id } = req.params;
+
+  try {
+    const carro = await knex<Carro>('carros')
+      .where({ id: Number(id) })
+      .first();
+
+    if (!carro) {
+      return res.status(404).json({ mensagem: 'Carro não encontrado' });
+    }
+
+    await knex<Carro>('carros')
+      .where({ id: Number(id) })
+      .del();
+
+    return res.status(204).send();
+  } catch {
+    return res.status(500).json({ message: 'Erro interno do servidor' });
+  }
+};
